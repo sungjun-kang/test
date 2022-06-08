@@ -1,0 +1,2176 @@
+﻿!- Version: SGOS 6.7.4.13 MACH5 Edition
+!- Serial number: 2915330173
+!- Local time: 2022-05-27 10:00:22+09:00KST
+!- BEGIN networking
+interface 0:0 ;mode
+ip-address 192.168.1.166 255.255.255.0
+exit
+interface 2:0 ;mode
+label "WAN"
+reject-inbound disable
+ip-address 25.25.111.9 255.255.255.0
+full-duplex
+speed 1gb
+exit
+interface 2:1 ;mode
+label "LAN"
+full-duplex
+speed 1gb
+exit
+ip-default-gateway 25.25.111.1 1 100
+dns-forwarding ;mode
+edit primary
+clear server
+add server 168.126.63.1
+exit
+exit
+!- END networking
+!- BEGIN ssl
+ssl ;mode
+edit ssl-device-profile default ;mode
+protocol tlsv1 tlsv1.1 tlsv1.2
+exit
+exit
+!- END ssl
+!- BEGIN ssh
+ssh-client ;mode
+known-hosts
+clear
+exit
+exit
+!- END ssh
+!- BEGIN authentication
+security allowed-access add 25.25.123.162 255.255.255.255
+security allowed-access add 100.89.254.191 255.255.255.255
+security allowed-access add 70.80.111.111 255.255.255.255
+security allowed-access add 182.198.132.76 255.255.255.255
+security allowed-access add 182.198.156.33 255.255.255.255
+security allowed-access add 182.198.156.34 255.255.255.255
+security allowed-access add 182.198.156.35 255.255.255.255
+security allowed-access add 182.198.132.78 255.255.255.255
+security allowed-access add 182.198.152.24 255.255.255.255
+security allowed-access add 182.198.152.47 255.255.255.255
+security allowed-access add 70.121.245.41 255.255.255.255
+security allowed-access add 70.80.111.106 255.255.255.255
+security allowed-access add 70.123.12.156 255.255.255.255
+security allowed-access add 70.123.12.158 255.255.255.255
+security allowed-access add 70.123.12.161 255.255.255.255
+security allowed-access add 70.123.12.162 255.255.255.255
+security allowed-access add 70.123.12.164 255.255.255.255
+security allowed-access add 70.123.12.165 255.255.255.255
+security allowed-access add 70.123.12.166 255.255.255.255
+security allowed-access add 70.123.12.124 255.255.255.255
+security allowed-access add 70.123.14.86 255.255.255.255
+security allowed-access add 70.123.20.161 255.255.255.255
+security allowed-access add 100.5.30.195 255.255.255.255
+security allowed-access add 100.5.30.203 255.255.255.255
+security allowed-access add 100.5.26.129 255.255.255.255
+security allowed-access add 100.5.30.202 255.255.255.255
+security allowed-access add 100.5.30.129 255.255.255.255
+security allowed-access add 100.5.26.77 255.255.255.255
+security allowed-access add 100.5.30.135 255.255.255.255
+security allowed-access add 100.5.26.162 255.255.255.255
+security allowed-access add 100.5.30.159 255.255.255.255
+security allowed-access add 100.5.30.157 255.255.255.255
+security hashed-enable-password "$1$0qPqjo$YzTcdTgXwS3EYaMTvZpRg."
+security hashed-password "$1$AuMj2j8L$uosnmqFiIENZVMAqofAcd."
+security username "sline"
+!- END authentication
+!- BEGIN general
+appliance-name "25.25.111.9 - Blue Coat SG-S200 Series"
+!- END general
+!- BEGIN proxies
+general ;mode
+user-overflow-action bypass
+exit
+!- END proxies
+!- BEGIN access_logging
+access-log  ;mode
+enable
+edit format main ;mode
+type elff "date time time-taken c-ip sc-status s-action sc-bytes cs-bytes cs-method cs-uri-scheme cs-host cs-uri-port cs-uri-path cs-uri-query cs-username cs-auth-group s-supplier-name rs(Content-Type) cs(Referer) cs(User-Agent) sc-filter-result cs-categories x-virus-id s-ip"
+exit
+edit format streaming ;mode
+type elff "date time time-taken c-ip sc-status s-action sc-bytes rs-bytes cs-method cs-uri-scheme cs-host cs-uri-port cs-uri-path cs-uri-query cs-username cs-auth-group cs(Referer) cs(User-Agent) c-starttime filelength filesize avgbandwidth x-rs-streaming-content x-streaming-rtmp-app-name x-streaming-rtmp-stream-name x-streaming-rtmp-swf-url x-streaming-rtmp-page-url s-ip s-dns s-session-id x-cache-info"
+exit
+edit format ssl ;mode
+type elff "date time time-taken c-ip s-action x-rs-certificate-validate-status x-rs-certificate-observed-errors x-cs-ocsp-error x-rs-ocsp-error cs-host s-supplier-name x-rs-connection-negotiated-ssl-version x-rs-connection-negotiated-cipher x-rs-connection-negotiated-cipher-size x-rs-certificate-hostname x-rs-certificate-hostname-category x-cs-connection-negotiated-ssl-version x-cs-connection-negotiated-cipher x-cs-connection-negotiated-cipher-size x-cs-certificate-subject s-ip s-sitename"
+exit
+create format "dns"
+edit format dns ;mode
+type elff "date time time-taken c-ip x-dns-cs-transport x-dns-cs-opcode x-dns-cs-qtype x-dns-cs-qclass x-dns-cs-dns x-dns-cs-address x-dns-rs-rcode x-dns-rs-a-records x-dns-rs-cname-records x-dns-rs-ptr-records s-ip"
+exit
+edit log main ;mode
+scp-client authentication password
+exit
+edit log streaming ;mode
+scp-client authentication password
+exit
+edit log ssl ;mode
+scp-client authentication password
+exit
+edit log cifs ;mode
+scp-client authentication password
+exit
+edit log mapi ;mode
+scp-client authentication password
+exit
+create log "dns"
+edit log dns ;mode
+description "Use for DNS protocol"
+format-name dns
+scp-client authentication password
+exit
+exit
+!- END access_logging
+!- BEGIN service_info
+diagnostics ;mode
+service-info ;mode
+upload-settings ;mode
+exit
+exit
+exit
+!- END service_info
+!- BEGIN proxies
+caching ;mode
+max-cache-size 4294
+exit
+!- END proxies
+!- BEGIN maintenance
+event-log ;mode
+syslog add 182.198.132.76
+syslog enable
+exit
+!- END maintenance
+!- BEGIN services
+proxy-services ;mode
+delete "FTPS"
+exit
+management-services ;mode
+edit "SNMP" ;mode
+enable all 161
+exit
+exit
+proxy-services ;mode
+edit "Explicit HTTP" ;mode
+intercept all explicit 8080
+attribute detect-protocol enable
+attribute authenticate-401 enable
+exit
+create tcp-tunnel "FTPS" "Bypass Recommended"
+edit "FTPS" ;mode
+add all transparent 989-990 bypass
+attribute adn-compress disable
+attribute adn-byte-cache disable
+attribute use-adn disable
+exit
+exit
+!- END services
+!- BEGIN networking
+ntp clear
+ntp server 100.254.201.26
+ntp server 100.254.202.26
+ntp server ntp.bluecoat.com
+ntp server ntp2.bluecoat.com
+!- END networking
+!- BEGIN general
+restart mode hardware
+!- END general
+!- BEGIN maintenance
+snmp ;mode
+protocol snmpv1 disable
+protocol snmpv2c disable
+protocol snmpv3 disable
+traps disable
+create community "sline=33"
+edit community "sline=33"
+authorization mode read-only
+authorization access-list
+enable
+add 100.89.254.191
+add 70.80.111.111
+add 100.253.30.30
+add 100.254.25.38
+add 182.198.132.76
+add 182.198.132.78
+add 100.253.188.201
+add 182.198.152.24
+add 182.198.152.47
+add 182.198.156.33
+add 182.198.156.34
+add 182.198.156.35
+exit
+exit
+exit
+!- END maintenance
+!- BEGIN general
+inline banner login end-833158822-inline
+sline
+end-833158822-inline
+!- END general
+!- BEGIN policy
+policy classification-path "https://bto.bluecoat.com/download/modules/security/SGv6/policyclassifier.xml"
+policy hmac encrypted-key "NE32FJKLnS0yq1PKcu4e5o1V7Uy/AxhK3/grwqFTy8RQiRRYKmcOKYnf0N/VuozyduMCApCNCuy4pg22e8JQznWY+jnQ47PEXnVHysK3xAQA88xnLA1p6c+bvmVp9yze9UkBLQ5ps1vP++ASc3wxdjqhfeZqhDCjludCpLuTqUZPHNU6JmQ9BZJ3GW4SosdFnqR6Bxlp2wT4is/M0y7/AlZT3C+slKI0+apc+J7OevCjGJe6JXokdg9RUfM9udoMApl9vryNbqyKV/ZjBLgRuqx1UwUJVMAIoDO76d9l2LLlQtQaT6lPkunerLlKQJLDB/6A/UbiKSrhvprLHlX8Zw=="
+!- END policy
+!- BEGIN general
+timezone set Asia/Seoul
+!- END general
+!- BEGIN proxies
+!
+inline exceptions end-833158822-inline
+(exception.all
+  (contact "For assistance, contact your network support team.")
+  (details)
+  (format "$(exception.id): $(exception.details)")
+  (help)
+  (summary)
+  (http
+    (code "200")
+    (contact)
+    (details)
+    (format <<--31a8fea6.a44a2--
+<HTML><HEAD>
+<TITLE>$(exception.summary)</TITLE>
+</HEAD>
+<BODY>
+<FONT face="Helvetica">
+<big><strong>$(exception.company_name)</strong></big><BR>
+</FONT>
+<blockquote>
+<TABLE border=0 cellPadding=1 width="80%">
+<TR><TD>
+<FONT face="Helvetica">
+<big>$(exception.summary) ($(exception.id))</big>
+<BR>
+<BR>
+</FONT>
+</TD></TR>
+<TR><TD>
+<FONT face="Helvetica">
+$(exception.details)
+</FONT>
+</TD></TR>
+<TR><TD>
+<FONT face="Helvetica">
+$(exception.help)
+</FONT>
+</TD></TR>
+<TR><TD>
+<FONT face="Helvetica" SIZE=2>
+<BR>
+$(exception.contact)
+</FONT>
+</TD></TR>
+</TABLE>
+</blockquote>
+</FONT>
+</BODY></HTML>
+--31a8fea6.a44a2--
+    )
+    (help)
+    (summary)
+  )
+  (exception.user-defined.all
+    (contact)
+    (details)
+    (format)
+    (help)
+    (summary)
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.coach
+    (contact)
+    (details <<--31a8fea6.a44aa--
+<p>Access to your requested resource has been logged by your organization's Content Filtering policy. If you have a legitimate reason to access this site please click to <a id='coach-continue-url' href="$(variable.Coach_continue_url)">Accept</a></p>
+--31a8fea6.a44aa--
+    )
+    (format)
+    (help <<--31a8fea6.a44ab--
+<p>For assistance, contact your network support team.</p>
+--31a8fea6.a44ab--
+    )
+    (summary <<--31a8fea6.a44c8--
+Confirm Access
+--31a8fea6.a44c8--
+    )
+    (http
+      (code "200")
+    )
+  )
+  (exception.password_override
+    (details <<--31a8fea6.a44ca--
+<p>Access to your requested resource has been denied by your organization's Content Filtering policy.</p>
+<p>If you have been provided with an override password to access this site please enter it below and click 'continue'.</p>
+<div id="errorWrapper"><div id="errorNotify" class="curved">&#160;</div></div>
+<div id="passwordForm"><form id="override" action="/">
+	<label for="pwinput">Override Password:</label>
+	<input id="pwinput" type="password" />
+	<input type="submit" id="sesame" value="continue" />
+</form></div>
+--31a8fea6.a44ca--
+    )
+    (help)
+    (summary <<--31a8fea6.a44cc--
+Password Required
+--31a8fea6.a44cc--
+    )
+    (http
+      (code "200")
+    )
+  )
+  (exception.authentication_failed
+    (contact)
+    (details "Your credentials could not be authenticated: $(quot)$(sc-auth-status)$(quot). You will not be permitted access until your credentials can be verified.")
+    (format)
+    (help "This is typically caused by an incorrect username and/or password, but could also be caused by network problems.")
+    (summary "Access Denied")
+    (http
+      (code "401")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.authentication_failed_password_expired
+    (contact)
+    (details "Your password was reported expired. You will not be permitted access unless your password is updated.")
+    (format)
+    (help "This is caused by settings on the authentication server.")
+    (summary "Access Denied")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.authentication_redirect_from_virtual_host
+    (contact)
+    (details "You are being redirected from the authentication virtual host to your original request.")
+    (format)
+    (help)
+    (summary "Redirect")
+    (http
+      (code "302")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.authentication_redirect_to_virtual_host
+    (contact)
+    (details "You are being redirected to the authentication virtual host.")
+    (format)
+    (help)
+    (summary "Redirect")
+    (http
+      (code "302")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.authentication_redirect_off_box
+    (contact)
+    (details "You are being redirected to an authentication service on another device.")
+    (format)
+    (help)
+    (summary "Redirect")
+    (http
+      (code "302")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.authentication_success
+    (contact)
+    (details <<--31a8fea6.a44f8--
+Click <a href="$(redirect.location)">here</a> if you are not automatically redirected.--31a8fea6.a44f8--
+    )
+    (format)
+    (help)
+    (summary "Redirect")
+    (http
+      (code "302")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.authorization_failed
+    (contact)
+    (details "Your request was not authorized.")
+    (format)
+    (help)
+    (summary "Access Denied")
+    (http
+      (code "401")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.configuration_error
+    (contact)
+    (details "Your request could not be processed because of a configuration error: $(quot)$(exception.last_error)$(quot)")
+    (format)
+    (help)
+    (summary "Appliance Error")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.connect_method_denied
+    (contact)
+    (details "Your request attempted a CONNECT to a port $(quot)$(url.port)$(quot) that is not permitted by default.")
+    (format)
+    (help "This is typically caused by an HTTPS URL that uses a port other then the default of 443.")
+    (summary "Access Denied")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.content_filter_denied
+    (contact)
+    (details "Your request was denied because of its content categorization: $(quot)$(cs-categories)$(quot)")
+    (format)
+    (help)
+    (summary "Access Denied")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.content_filter_unavailable
+    (contact)
+    (details "Your request was denied because an external content filtering service was not available.")
+    (format)
+    (help "This could be caused by transient network problems, or a configuration error.")
+    (summary "Access Denied")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.dns_server_failure
+    (contact)
+    (details "Your request could not be processed because an error occurred contacting the DNS server.")
+    (format)
+    (help "The DNS server may be temporarily unavailable, or there could be a network problem.")
+    (summary "Network Error")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.dns_unresolved_hostname
+    (contact)
+    (details "Your requested host $(quot)$(url.host)$(quot) could not be resolved by DNS.")
+    (format)
+    (help)
+    (summary "Network Error")
+    (http
+      (code "404")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.dynamic_bypass_reload
+    (contact)
+    (details <<--31a8fea6.a4547--
+Click <a href="$(redirect.location)">here</a> if you are not automatically redirected.--31a8fea6.a4547--
+    )
+    (format)
+    (help)
+    (summary "Refresh")
+    (http
+      (code "200")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.content_encoding_error
+    (contact)
+    (details "Server response could not be decoded using encoding type returned by server.")
+    (format)
+    (help "This is typically caused by a Web Site presenting a content encoding header of one type, and then encoding the data differently.")
+    (summary "Content Encoding Error")
+    (http
+      (code "502")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.gateway_error
+    (contact)
+    (details "An error occurred attempting to communicate with an HTTP or SOCKS gateway.")
+    (format)
+    (help "The gateway may be temporarily unavailable, or there could be a network problem.")
+    (summary "Network Error")
+    (http
+      (code "504")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.icap_communication_error
+    (contact)
+    (details "An error occurred attempting to communicate with an ICAP server.")
+    (format)
+    (help "The ICAP server may be temporarily unavailable, there could be network problem, or the ICAP service may be misconfigured.")
+    (summary "ICAP Error")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.icap_error
+    (contact)
+    (details "An error occurred while performing an ICAP operation: $(icap_error_details)")
+    (format)
+    (help "There could be a network problem, the ICAP service may be misconfigured, or the ICAP server may have reported an error.")
+    (summary "ICAP Error")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.internal_error
+    (contact)
+    (details "An unrecoverable error was encountered: $(quot)$(exception.last_error)$(quot)")
+    (format)
+    (help "This problem is unexpected. Please use the contact information below to obtain assistance.")
+    (summary "Appliance Error")
+    (http
+      (code "500")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.invalid_request
+    (contact)
+    (details "Your request could not be processed. $(exception.reason)")
+    (format)
+    (help "This could be caused by a misconfiguration, or possibly a malformed request.")
+    (summary "Request Error")
+    (http
+      (code "400")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.invalid_response
+    (contact)
+    (details "Server's response could not be processed. $(exception.reason)")
+    (format)
+    (help "This could be caused by a malformed response, or possibly a misconfiguration.")
+    (summary "Response Error")
+    (http
+      (code "502")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.license_expired
+    (contact)
+    (details "A license has expired on the Proxy, and your request is not permitted: $(quot)$(exception.reason)$(quot)")
+    (format)
+    (help "A new license must be obtained.")
+    (summary "Access Denied")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.license_exceeded
+    (contact)
+    (details "A license has been exceeded on the Proxy, and your request is not permitted: $(quot)$(exception.reason)$(quot)")
+    (format)
+    (help)
+    (summary "Access Denied")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.license_suspended
+    (contact)
+    (details "Your request is not permitted: $(quot)$(exception.reason)$(quot)")
+    (format)
+    (help "Contact Blue Coat customer support.")
+    (summary "Access Denied")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.method_denied
+    (contact)
+    (details "The method used $(quot)$(method)$(quot) is not permitted: $(quot)$(exception.reason)$(quot)")
+    (format)
+    (help)
+    (summary "Access Denied")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.not_implemented
+    (contact)
+    (details "Your requested operation: $(quot)$(method) $(url.host)$(quot) is not supported.")
+    (format)
+    (help)
+    (summary "Access Denied")
+    (http
+      (code "501")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.policy_denied
+    (contact)
+    (details "Your system policy has denied the requested action.")
+    (format)
+    (help)
+    (summary "Access Denied")
+    (http
+      (code "403")
+      (contact)
+      (details "Your system policy has denied access to the requested URL.")
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.policy_redirect
+    (contact)
+    (details <<--31a8fea6.a45c2--
+Click <a href="$(redirect.location)">here</a> if you are not automatically redirected.--31a8fea6.a45c2--
+    )
+    (format)
+    (help)
+    (summary "Redirect")
+    (http
+      (code "302")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.policy_request_redirect
+    (contact)
+    (details <<--31a8fea6.a45c6--
+Click <a href="$(redirect.location)">here</a> if you are not automatically redirected.--31a8fea6.a45c6--
+    )
+    (format)
+    (help)
+    (summary "Redirect")
+    (http
+      (code "302")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.radius_splash_page
+    (contact)
+    (details "Click the the refresh button on your browser to proceed to your requested site. Your user/session ID is $(x-radius-splash-username)/$(x-radius-splash-session-id)")
+    (format)
+    (help)
+    (summary "Authorized")
+    (http
+      (code "200")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.refresh
+    (contact)
+    (details <<--31a8fea6.a45e7--
+Click <a href="$(redirect.location)">here</a> if you are not automatically redirected.--31a8fea6.a45e7--
+    )
+    (format)
+    (help)
+    (summary "Authorized")
+    (http
+      (code "200")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.silent_denied
+    (contact)
+    (details "$(empty)")
+    (format "$(empty)")
+    (help)
+    (summary)
+    (http
+      (code "403")
+      (contact)
+      (details "$(empty)")
+      (format "$(empty)")
+      (help)
+      (summary)
+    )
+  )
+  (exception.ssl_domain_invalid
+    (contact)
+    (details "Your request contacted a host which presented a certificate with a Common Name that did not match the domain requested.")
+    (format)
+    (help "This is typically caused by a Web Site presenting an incorrect or invalid certificate, but could be because of a configuration error.")
+    (summary "SSL Certificate Hostname Mismatch")
+    (http
+      (code "409")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.ssl_failed
+    (contact)
+    (details "A secure SSL session could not be established with the Web Site: $(quot)$(ssl_failure_reason)$(quot).")
+    (format)
+    (help "This is typically caused by a Web Site that is not configured to accept SSL connections, or the Proxy does not trust the Web Site's certificate authority, or else the Proxy does not support client certificate authentication requests from the origin server.")
+    (summary "SSL Error")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.tcp_error
+    (contact)
+    (details "A communication error occurred: $(quot)$(server_connection.socket_errno)$(quot)")
+    (format)
+    (help "The Web Server may be down, too busy, or experiencing other problems preventing it from responding to requests. You may wish to try again at a later time.")
+    (summary "Network Error")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.unsupported_protocol
+    (contact)
+    (details "Your request used a protocol that is not currently supported.")
+    (format)
+    (help)
+    (summary "Request Error")
+    (http
+      (code "406")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.unsupported_encoding
+    (contact)
+    (details "Your requested content encoding is not supported.")
+    (format)
+    (help "This could be caused by a misconfiguration, or an expired compression license on the Proxy.")
+    (summary "Unsupported Encoding")
+    (http
+      (code "406")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.transformation_error
+    (contact)
+    (details "Proxy cannot apply content transformation.")
+    (format)
+    (help "This could be caused by a misconfiguration, or possibly a response with an unknown content encoding.")
+    (summary "Content Transformation Error")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.invalid_auth_form
+    (contact)
+    (details "The submitted authentication form is invalid.  The form data must contain the username, password and valid original request information.")
+    (format)
+    (help)
+    (summary "Invalid Authentication Form")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.authentication_mode_not_supported
+    (contact)
+    (details "The configured authentication mode is not supported for the current request.")
+    (format)
+    (help)
+    (summary "Authentication Mode Not Supported")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.redirected_stored_requests_not_supported
+    (contact)
+    (details "The origin server returned a redirect for your request.  The ProxySG is configured to not allow stored requests to be redirected.")
+    (format)
+    (help)
+    (summary "Stored Request Redirects Not Supported")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.client_failure_limit_exceeded
+    (contact)
+    (details "Too many requests from your ip address ($(client.effective_address)) have violated the security policy.")
+    (format)
+    (help "Please verify that the server you are attempting to contact is correct.  Continued failures will result in a complete revocation of access.")
+    (summary "Client Failure Limit Exceeded")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.server_request_limit_exceeded
+    (contact)
+    (details "Too many requests are in progress to $(url.host).")
+    (format)
+    (help "Too many simultaneous requests are outstanding to this origin server.  The server may be under attack.  Please try your request again later.")
+    (summary "Server Request Limit Exceeded")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.notify
+    (format "CPL users: use the third argument of 'exception()' to place your message here.")
+    (http
+      (code "200")
+    )
+  )
+  (exception.notify_missing_cookie
+    (summary "Notify Failed--Cookie Not Sent")
+    (details "You could not be redirected to your originally requested web page because your web browser has failed to send a required cookie.")
+    (help "Your web browser appears to be improperly configured.  It must not be configured to block all cookies.")
+    (http
+      (code "403")
+    )
+  )
+  (exception.ssl_server_cert_expired
+    (contact)
+    (details "Your request contacted a host which presented an expired or Invalid certificate")
+    (format)
+    (help "This is typically caused by a Web Site presenting an incorrect or invalid certificate, but could be because of a configuration error.")
+    (summary "Expired SSL Server Certificate")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.ssl_server_cert_ocsp_check_failed
+    (contact)
+    (details "OCSP check for server certificate failed due to error: $(quot)$(x-rs-ocsp-error)$(quot)")
+    (format)
+    (help "An error occurred while checking revocation status of the certificate. Contact the administrator for further assistance")
+    (summary "OCSP Error On Server Certificate")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.ssl_server_cert_ocsp_status_unknown
+    (contact)
+    (details "OCSP check returned unknown status for server certificate.")
+    (format)
+    (help "An error occurred while checking revocation status of the certificate. Contact the administrator for further assistance.")
+    (summary "Unknown OCSP Status of Server Certificate")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.ssl_server_cert_untrusted_issuer
+    (contact)
+    (details "Your request contacted a host which presented a certificate signed by an untrusted issuer.")
+    (format)
+    (help "This is typically caused by a Web Site presenting an incorrect or invalid certificate, but could be because of a configuration error.")
+    (summary "Untrusted SSL Server Certificate")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.ssl_server_cert_revoked
+    (contact)
+    (details "Your request contacted a host which presented a revoked certificate.")
+    (format)
+    (help "This is typically caused by a Web Site presenting a revoked certificate, but could be because of a configuration error.")
+    (summary "Revoked SSL Server Certificate")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.ssl_client_cert_expired
+    (contact)
+    (details "The client presented a certificate with invalid dates.")
+    (format)
+    (help "This is typically caused by a Web Site presenting an incorrect or invalid certificate, but could be because of a configuration error.")
+    (summary "Expired SSL Client Certificate")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.ssl_client_cert_ocsp_check_failed
+    (contact)
+    (details "OCSP check for client certificate failed due to error: $(quot)$(x-cs-ocsp-error)$(quot)")
+    (format)
+    (help "An error occurred while checking revocation status of the certificate. Contact the administrator for further assistance.")
+    (summary "OCSP Error On Client Certificate")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.ssl_client_cert_ocsp_status_unknown
+    (contact)
+    (details "OCSP check returned unknown status for client certificate.")
+    (format)
+    (help "An error occurred while checking revocation status of the certificate. Contact the administrator for further assistance.")
+    (summary "Unknown OCSP Status of Client Certificate")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.ssl_client_cert_untrusted_issuer
+    (contact)
+    (details "The client presented an untrusted certificate.")
+    (format)
+    (help "This is typically caused by a Web Site presenting an incorrect or invalid certificate, but could be because of a configuration error.")
+    (summary "Untrusted SSL Client Certificate")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.ssl_client_cert_revoked
+    (contact)
+    (details "The client presented a revoked certificate.")
+    (format)
+    (help "This is typically caused by the client presenting a revoked certificate, but could be because of a configuration error.")
+    (summary "Revoked SSL Client Certificate")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.bad_credentials
+    (summary "Invalid username/password")
+    (details <<--31a8fea6.a46b7--
+			<p>Your username or password were sent using an invalid/unrecognized format.</p>
+			<p><i>Please close your browser window.</i></p>
+			<p>Then, either contact technical support,
+			or try again using a different username/password combination.</p>
+			<p><small>
+			There are two possible causes:
+			<ul>
+			<li>Your username or password contains non-ASCII characters,
+				and the ProxySG is not configured to use the same authentication character
+				encoding as is being used by your web browser.
+			<li>Your username or password is too long.
+				(The limits for the username and password are 64 bytes each,
+				after being translated to UTF-8.)
+			</ul>
+			</small></p>
+			--31a8fea6.a46b7--
+    )
+    (http
+      (code "400")
+    )
+  )
+  (exception.server_authentication_error
+    (summary "Internal error")
+    (details <<--31a8fea6.a46ba--
+			The ProxySG encountered an internal error
+			while preparing to send your username/password upstream: $(quot)$(exception.last_error)$(quot)
+			--31a8fea6.a46ba--
+    )
+    (help <<--31a8fea6.a46bc--
+			This error can only occur when the ProxySG "server authentication" feature is used.
+			--31a8fea6.a46bc--
+    )
+    (http
+      (code "500")
+    )
+  )
+  (exception.virus_detected
+    (contact)
+    (details "Content contained $(quot)$(x-virus-id)$(quot) virus. Details:$(crlf)$(x-virus-details)")
+    (format)
+    (help)
+    (summary "Virus was detected in the content")
+    (http
+      (code "200")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.authentication_log_out
+    (contact)
+    (details <<--31a8fea6.a46c1--
+Click <a href="$(redirect.location)">here</a> to login.--31a8fea6.a46c1--
+    )
+    (format)
+    (help)
+    (summary "Logged out")
+    (http
+      (code "200")
+      (contact)
+      (details)
+      (format <<--31a8fea6.a46df--
+<HTML><HEAD>
+<TITLE>$(exception.summary)</TITLE>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (document.execCommand)
+{
+  if (document.execCommand("ClearAuthenticationCache", false)) {
+    document.cookie = 'BCSI-AC-$(appliance.identifier)=; path=/';
+  }
+}
+//-->
+</SCRIPT>
+</HEAD>
+<BODY>
+<FONT face="Helvetica">
+<big><strong>$(exception.company_name)</strong></big><BR>
+</FONT>
+<blockquote>
+<TABLE border=0 cellPadding=1 width="80%">
+<TR><TD>
+<FONT face="Helvetica">
+<big>$(exception.summary) ($(exception.id))</big>
+<BR>
+<BR>
+</FONT>
+</TD></TR>
+<TR><TD>
+<FONT face="Helvetica">
+$(exception.details)
+</FONT>
+</TD></TR>        You will be redirected to a federated SAML server to proceed with authentication. 
+        Click the Continue button to proceed.
+
+<TR><TD>
+<FONT face="Helvetica">
+$(exception.help)
+</FONT>
+</TD></TR>
+<TR><TD>
+<FONT face="Helvetica" SIZE=2>
+<BR>
+$(exception.contact)
+</FONT>
+</TD></TR>
+</TABLE>
+</blockquote>
+</FONT>
+</BODY></HTML>
+--31a8fea6.a46df--
+      )
+      (help)
+      (summary)
+    )
+  )
+  (exception.saml_post
+    (contact)
+    (summary "SAML POST")
+    (details <<--31a8fea6.a46e4--
+        You will be redirected to a federated SAML server to proceed with authentication. 
+        Click the Continue button to proceed.
+        --31a8fea6.a46e4--
+    )
+    (format)
+    (help)
+    (http
+      (code "200")
+      (contact)
+      (details)
+      (format <<--31a8fea6.a46e6--
+<html>
+<body onload="document.forms[0].submit()">
+<noscript>
+<p>$(exception.details)</p>
+</noscript>
+<form action="$(saml.endpoint)" method="post">
+<input type="hidden" name="RelayState" value="$(saml.relaystate)"/>
+<input type="hidden" name="SAMLRequest" value="$(saml.postdata)"/>
+<noscript>
+<input type="submit" value="Continue"/>
+</noscript>
+</form>
+</body>
+</html>
+            --31a8fea6.a46e6--
+      )
+      (help)
+      (summary)
+    )
+  )
+  (exception.invalid_saml_post
+    (contact)
+    (details "A request was received at the SAML POST endpoint that did not contain valid SAML POST data. If you reached here by pressing the browser's back button, please enter the target URL in the address bar.")
+    (format)
+    (help)
+    (summary "Invalid SAML POST")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.upstream_407_rejected
+    (contact)
+    (details "An unexpected 407 challenge was received from an upstream server.")
+    (format)
+    (help "Upstream 407 challenges are blocked by default to protect client credentials. Such challenges may appear to come from the proxy, rather than from the upstream server.")
+    (summary "Upstream 407 rejected")
+    (http
+      (code "503")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.policy_time_quota_exceeded
+    (contact)
+    (details "You have exceeded the allocated $(time_quota_frequency) limit of $(time_quota_limit) minutes for '$(time_quota_name)'.")
+    (format)
+    (help)
+    (summary "Access Denied")
+    (http
+      (code "403")
+      (contact)
+      (details "You have exceeded the allocated $(time_quota_frequency) limit of $(time_quota_limit) minutes for '$(time_quota_name)'.")
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.policy_time_quota_warning
+    (contact)
+    (details "Your allocated $(time_quota_frequency) limit for '$(time_quota_name)' is $(time_quota_limit) minutes. Your usage has passed the warning limit of $(time_quota_warning_limit) minutes.")
+    (format)
+    (help)
+    (summary "Access Warning")
+    (http
+      (code "200")
+      (contact)
+      (details "Your allocated $(time_quota_frequency) limit for '$(time_quota_name)' is $(time_quota_limit) minutes. Your usage has passed the warning limit of $(time_quota_warning_limit) minutes.")
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.policy_volume_quota_exceeded
+    (contact)
+    (details "You have exceeded the allocated $(volume_quota_frequency) limit of $(volume_quota_limit) bytes for '$(volume_quota_name)'.")
+    (format)
+    (help)
+    (summary "Access Denied")
+    (http
+      (code "403")
+      (contact)
+      (details "You have exceeded the allocated $(volume_quota_frequency) limit of $(volume_quota_limit) bytes for '$(volume_quota_name)'.")
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.policy_volume_quota_warning
+    (contact)
+    (details "Your allocated $(volume_quota_frequency) limit for '$(volume_quota_name)' is $(volume_quota_limit) bytes. Your usage has passed the warning limit of $(volume_quota_warning_limit) bytes.")
+    (format)
+    (help)
+    (summary "Access Warning")
+    (http
+      (code "200")
+      (contact)
+      (details "Your allocated $(volume_quota_frequency) limit for '$(volume_quota_name)' is $(volume_quota_limit) bytes. Your usage has passed the warning limit of $(volume_quota_warning_limit) bytes.")
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.301_loopback_error
+    (summary "301 Redirect Loop Detected")
+    (details "Your request results in redirection back to 127.0.0.1")
+    (http
+      (code "301")
+    )
+  )
+  (exception.data_leak_detected
+    (contact)
+    (details "Content contained data that is not allowed to be sent outside of restricted network")
+    (format)
+    (help)
+    (summary "A data leak was detected in the content")
+    (http
+      (code "200")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.geoip_denied
+    (contact)
+    (details "Your system policy has denied access due to geographic restrictions.")
+    (format)
+    (help "None of the servers hosting the requested URL are in permitted countries.")
+    (summary "Access denied by GeoIP")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+  (exception.tcp_error_geoip_restricted
+    (contact)
+    (details "A communication error occured: $(quot)$(server_connection.socket_errno)$(quot)")
+    (format)
+    (help <<--31a8fea6.a473a--
+       <p>The Web Server may be down, too busy, or experiencing other problems preventing it from responding to requests. You may wish to try again at a later time.</p>
+       <p>NOTE: Some servers were in disallowed countries and were not contacted.</p>
+       --31a8fea6.a473a--
+    )
+    (summary "Network Error")
+    (http
+      (code "403")
+      (contact)
+      (details)
+      (format)
+      (help)
+      (summary)
+    )
+  )
+)
+end-833158822-inline
+!
+!- END proxies
+!- BEGIN authentication
+!
+inline authentication-forms end-833158822-inline
+(exception.auth
+  (exception.authentication_form
+    (properties
+      (form_type "authentication_form")
+    )
+    (http
+      (code "200")
+      (format <<--31a8fea6.a4ec1--
+<HTML>
+<HEAD>
+<TITLE>Enter Proxy Credentials for Realm $(cs-realm)</TITLE>
+</HEAD>
+<BODY>
+<H1>Enter Proxy Credentials for Realm $(cs-realm)</H1>
+<P>Reason for challenge: $(exception.last_error)
+<P>$(x-auth-challenge-string)
+<FORM METHOD="POST" ACTION=$(x-cs-auth-form-action-url)>
+$(x-cs-auth-form-empty-domain-field)
+<P>Username: <INPUT NAME="PROXY_SG_USERNAME" MAXLENGTH="64"></P>
+<!-- To prepopulate the Username field with a previously entered username, set the VALUE field to the cs-username substitution -->
+<P>Password: <INPUT TYPE=PASSWORD NAME="PROXY_SG_PASSWORD" MAXLENGTH="64"></P>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_REQUEST_ID" VALUE="$(x-cs-auth-request-id)">
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_PRIVATE_CHALLENGE_STATE" VALUE="$(x-auth-private-challenge-state)">
+<P><INPUT TYPE=SUBMIT VALUE="Submit"> <INPUT TYPE=RESET></P>
+</FORM>
+<P>$(exception.contact)
+</BODY>
+</HTML>
+--31a8fea6.a4ec1--
+      )
+    )
+  )
+  (exception.new_pin_form
+    (properties
+      (form_type "new_pin_form")
+    )
+    (http
+      (code "200")
+      (format <<--31a8fea6.a4ec5--
+<HTML>
+<HEAD>
+<TITLE>Create New PIN for Realm $(cs-realm)</TITLE>
+<SCRIPT LANGUAGE="JavaScript"><!--
+function validatePin() {
+var info;
+var pin = document.pin_form.PROXY_SG_PASSWORD;
+if (pin.value != document.pin_form.PROXY_SG_RETYPE_PIN.value) {
+	info = "The PINs did not match.  Please enter them again.";
+} else {
+	// Edit this regular expression to match local PIN definition
+	var re=/^[A-Za-z0-9]{4,16}$/
+	var match=re.exec(pin.value);
+	if (match == null) {
+		info = "The PIN must be 4 to 16 alphanumeric characters";
+	} else {
+		return true;
+	}
+}
+alert(info);
+pin.select();
+pin.focus();
+return false;
+}// -->
+</script>
+</HEAD>
+<BODY>
+<H1>Create New PIN for Realm $(cs-realm)</H1>
+<P>$(x-auth-challenge-string)
+<FORM NAME="pin_form" METHOD="POST" ACTION=$(x-cs-auth-form-action-url) ONSUBMIT="return validatePin()">
+$(x-cs-auth-form-empty-domain-field)
+<P> Enter New Pin: <INPUT TYPE=PASSWORD NAME="PROXY_SG_PASSWORD" MAXLENGTH="64"></P>
+<P>Retype New Pin: <INPUT TYPE=PASSWORD NAME="PROXY_SG_RETYPE_PIN" MAXLENGTH="64"></P>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_USERNAME" VALUE=$(cs-username)>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_REQUEST_ID" VALUE=$(x-cs-auth-request-id)>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_PRIVATE_CHALLENGE_STATE" VALUE=$(x-auth-private-challenge-state)>
+<P><INPUT TYPE=SUBMIT VALUE="Submit"></P>
+</FORM>
+<P>$(exception.contact)
+</BODY>
+</HTML>
+--31a8fea6.a4ec5--
+      )
+    )
+  )
+  (exception.query_form
+    (properties
+      (form_type "query_form")
+    )
+    (http
+      (code "200")
+      (format <<--31a8fea6.a4f3c--
+<HTML>
+<HEAD>
+<TITLE>Query for Realm $(cs-realm)</TITLE>
+</HEAD>
+<BODY>
+<H1>Query for Realm $(cs-realm)</H1>
+<P>$(x-auth-challenge-string)
+<FORM METHOD="POST" ACTION=$(x-cs-auth-form-action-url)>
+$(x-cs-auth-form-empty-domain-field)
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_USERNAME" VALUE=$(cs-username)>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_REQUEST_ID" VALUE=$(x-cs-auth-request-id)>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_PRIVATE_CHALLENGE_STATE" VALUE=$(x-auth-private-challenge-state)>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_PASSWORD"">
+<P><INPUT TYPE=SUBMIT VALUE="Yes" ONCLICK="PROXY_SG_PASSWORD.value='Y'">
+<INPUT TYPE=SUBMIT VALUE="No" ONCLICK="PROXY_SG_PASSWORD.value='N'"></P>
+</FORM>
+<P>$(exception.contact)
+</BODY>
+</HTML>
+--31a8fea6.a4f3c--
+      )
+    )
+  )
+  (exception.new_auth
+    (properties
+      (form_type "authentication_form")
+    )
+    (http
+      (code "200")
+      (format <<--31a8fea6.a4f40--
+<HTML>
+<HEAD>
+<TITLE>Enter Proxy Credentials for Realm $(cs-realm)</TITLE>
+</HEAD>
+<BODY onload="if(document.auth_form.PROXY_SG_USERNAME.value.length == 0) document.auth_form.PROXY_SG_USERNAME.focus(); else document.auth_form.PROXY_SG_PASSWORD.focus();">
+<H1>Enter Proxy Credentials for Realm $(cs-realm)</H1>
+<P>Reason for challenge: $(exception.last_error)
+<P>$(x-auth-challenge-string)
+<FORM NAME="auth_form" METHOD="POST" ACTION=$(x-cs-auth-form-action-url)>
+$(x-cs-auth-form-empty-domain-field)
+<P>Username: <INPUT NAME="PROXY_SG_USERNAME" VALUE="$(cs-username)" MAXLENGTH="64"></P>
+<P>Password: <INPUT TYPE=PASSWORD NAME="PROXY_SG_PASSWORD" MAXLENGTH="64"></P>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_REQUEST_ID" VALUE="$(x-cs-auth-request-id)">
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_PRIVATE_CHALLENGE_STATE" VALUE="$(x-auth-private-challenge-state)">
+<P><INPUT TYPE=SUBMIT VALUE="Submit"> <INPUT TYPE=RESET></P>
+</FORM>
+<P>$(exception.contact)
+</BODY>
+</HTML>
+--31a8fea6.a4f40--
+      )
+    )
+  )
+  (exception.sbr_EN
+    (properties
+      (form_type "authentication_form")
+    )
+    (http
+      (code "200")
+      (format <<--31a8fea6.a4f44--
+<HTML>
+<HEAD>
+<TITLE>Enter Proxy Credentials for Realm $(cs-realm)</TITLE>
+<script type="text/javascript">
+// prompttype 0 parses standard RSA RADIUS >= 6.1 (SBR) prompts to determine behavior,
+// 	if realm name contains the string in rsacompare
+// prompttype 1 parses an escaped format string
+var prompttype = 0;
+
+// String to identify Realm is for RSA RADIUS
+var rsacompare = "rsa";
+
+// For prompttype 0
+// String to uniquely identify a new PIN operation
+var newpincompare = "a new PIN";
+// String to indicate new PIN may contain alphanumeric characters
+var alphacompare = "alphanumeric";
+// String to indicate new PIN length is a range
+var rangecompare = "PIN having from";
+// Offset to indicate where the lower bound new PIN length occurs relative to rangecompare string
+var rangeoffset1 = 16;
+// Offset to indicate where the upper bound new PIN length occurs relative to rangecompare string
+var rangeoffset2 = 21;
+// String to indicate new PIN length is a specific length (rangecompare is tested first)
+var specificcompare = "PIN having ";
+// Offset to indicate where the new PIN length occurs relative to specificcompare string
+var specificoffset = 11;
+// String to uniquely identify a query operation
+var querycompare = "y/n";
+// String to uniquely identify a re-enter PIN operation
+var reentercompare = "re-enter";
+// String to uniquely identify a message only operation
+var messagecompare = "PIN rejected";
+
+// For prompttype 1
+// String to identify the beginning of an escaped format string
+var startformat = "<F>";
+// String to identify the end of an escaped format string
+var endformat = "</F>";
+// String to identify the replacement variable for length1
+var len1compare = "<x>";
+// String to identify the replacement variable for length2
+var len2compare = "<y>";
+
+// Default to authentication form
+var formtype='A';
+var alphatype;
+var length1;
+var length2;
+
+var cookieEnabled=(navigator.cookieEnabled)? true : false
+
+//if not IE4+ nor NS6+
+if (typeof navigator.cookieEnabled=="undefined" && !cookieEnabled){
+document.cookie="testcookie"
+cookieEnabled=(document.cookie.indexOf("testcookie")!=-1)? true : false
+}
+
+function createCookie(name,value,days)
+{
+	if (days) {
+		var date = new Date();
+		date.setTime(date.getTime()+(days*24*60*60*1000));
+		var expires = "; expires="+date.toGMTString();
+	}
+	else var expires = "";
+	document.cookie = name+"="+value+expires+"; path=/";
+}
+
+function readCookie(name)
+{
+	var nameEQ = name + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0;i < ca.length;i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1,c.length);
+		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+	}
+	return null;
+}
+
+function eraseCookie(name)
+{
+	createCookie(name,"",-1);
+}
+
+function validatePin()
+{
+	if(formtype=='R')
+		return true;
+	var info;
+	var pin = document.pin_form.PROXY_SG_PASSWORD;
+	if (pin.value != document.pin_form.PROXY_SG_RETYPE_PIN.value)
+	{
+		info = "The PINs did not match.  Please enter them again.";
+	}
+	else
+	{
+		// Regular expression uses parsed data to match local PIN definition
+		var restring;
+		var re;
+		if(alphatype=='A')
+		{
+			restring="^[A-Za-z0-9]{"+length1+","+length2+"}$";
+			info = "The PIN must be "+length1+" to "+length2+" alphanumeric characters";
+		}
+		else
+		{
+			restring="^[0-9]{"+length1+","+length2+"}$";
+			info = "The PIN must be "+length1+" to "+length2+" digits (no alphabetic characters)";
+		}
+		re = new RegExp(restring);
+		var match=re.exec(pin.value);
+		if (match != null)
+		{
+			createCookie('sgosRSARADIUS', pin.value, 0.0007);  // 1 minute lifetime
+			return true;
+		}
+	}
+	alert(info);
+	document.pin_form.PROXY_SG_RETYPE_PIN.value = "";
+	pin.select();
+	pin.focus();
+	return false;
+}
+
+function startup()
+{
+	var challenge;
+	var realm;
+	var isrsarealm;
+	var lengthtype;
+	var location;
+	var beginlocation;
+	var beginlength;
+	var endlocation;
+	var endlength;
+	var formatloc;
+
+	challenge=document.getElementById('challengediv').innerHTML;
+	if(challenge.length>0)
+	{
+		realm = "$(cs-realm)";
+		realm = realm.toLowerCase();
+		rsacompare = rsacompare.toLowerCase();
+		isrsarealm = (realm.indexOf(rsacompare) != -1);
+		beginlocation = challenge.indexOf(startformat);
+		if (prompttype == 0 && isrsarealm)
+		{
+			if(cookieEnabled && challenge.indexOf(newpincompare) != -1)
+			{
+				formtype='P';
+				if(challenge.indexOf(alphacompare) != -1)
+					alphatype='A';
+				else
+					alphatype='D';
+				if((location = challenge.indexOf(rangecompare)) != -1)
+				{
+					lengthtype='2';
+					length1=challenge.charAt(location + rangeoffset1);
+					length2=challenge.charAt(location + rangeoffset2);
+				}
+				else if((location = challenge.indexOf(specificcompare)) != -1)
+				{
+					lengthtype='1';
+					length2=length1=challenge.charAt(location + specificoffset);
+				}
+			}
+			else if(challenge.indexOf(querycompare) != -1)
+				formtype='Q';
+			else if(cookieEnabled && challenge.indexOf(reentercompare) != -1)
+				formtype='R';
+			else if(challenge.indexOf(messagecompare) != -1)
+				formtype='M';
+		}
+		else if (prompttype == 1 && beginlocation != -1)
+		{
+			beginlength = startformat.length;
+			endlocation = challenge.indexOf(endformat);
+			endlength = endformat.length;
+			formatloc = beginlocation + beginlength;
+
+			// Prompts contain a simple escaped format string
+			// First character is the formtype where Q=Query, P=New Pin, R=Re-enter New Pin,
+			//				A=Authentication, M=Message, S=Subsequent New Pin
+			// New Pin - Second Character is the alphatype where A=alphanumeric and D=digital
+			// New Pin - Third Character is an indicator of whether pin length is a specific length (1) or range (2)
+			// New Pin - Fourth Character is the first length of either specific length or range
+			// New Pin with range lenth - Fifth character is the second length of a range
+			formtype=challenge.charAt(formatloc);
+			cleanchallenge = challenge.substring(0, beginlocation) + challenge.substring(endlocation + endlength);
+			if(formtype=='P')
+			{
+				alphatype=challenge.charAt(formatloc+1);
+				lengthtype=challenge.charAt(formatloc+2);
+				length1=challenge.charAt(formatloc+3);
+				beginlocation = cleanchallenge.indexOf(len1compare);
+				cleanchallenge = cleanchallenge.substring(0, beginlocation) + length1 + cleanchallenge.substring(beginlocation + len1compare.length);
+				if(lengthtype=='1')
+					length2=length1;
+				else
+				{
+					length2=challenge.charAt(formatloc+4);
+					beginlocation = cleanchallenge.indexOf(len2compare);
+					cleanchallenge = cleanchallenge.substring(0, beginlocation) + length2 + cleanchallenge.substring(beginlocation + len2compare.length);
+				}
+			}
+			document.getElementById('challengediv').innerHTML = cleanchallenge;
+		}
+		if(!cookieEnabled && (formtype=='P' || formtype=='R'))
+			formtype='A';
+	}
+
+	if (formtype=='Q')
+	{
+		document.title="Query for Realm $(cs-realm)";
+		document.getElementById('heading1').innerHTML="Query for Realm $(cs-realm)";
+		document.getElementById('reasondiv').style.display='none';
+		document.auth_form.style.display='none';
+		document.pin_form.style.display='none';
+		document.query_form.style.display='block';
+		document.message_form.style.display='none';
+	}
+	else if (formtype=='P')
+	{
+		document.title="Create New PIN for Realm $(cs-realm)";
+		document.getElementById('heading1').innerHTML="Create New PIN for Realm $(cs-realm)";
+		document.getElementById('reasondiv').style.display='none';
+		document.auth_form.style.display='none';
+		document.pin_form.style.display='block';
+		document.query_form.style.display='none';
+		document.message_form.style.display='none';
+		document.pin_form.PROXY_SG_PASSWORD.focus();
+	}
+	else if (formtype=='A')
+	{
+		document.title="Enter Proxy Credentials for Realm $(cs-realm)";
+		document.getElementById('heading1').innerHTML="Enter Proxy Credentials for Realm $(cs-realm)";
+		document.getElementById('reasondiv').style.display='block';
+		document.auth_form.style.display='block';
+		document.pin_form.style.display='none';
+		document.query_form.style.display='none';
+		document.message_form.style.display='none';
+		if(document.auth_form.PROXY_SG_USERNAME.value.length == 0)
+			document.auth_form.PROXY_SG_USERNAME.focus();
+		else
+			document.auth_form.PROXY_SG_PASSWORD.focus();
+	}
+	else if (formtype=='R')
+	{
+		var pincookie = readCookie('sgosRSARADIUS');
+		document.pin_form.PROXY_SG_PASSWORD.value = pincookie;
+		document.pin_form.PROXY_SG_RETYPE_PIN.value = pincookie;
+		eraseCookie('sgosRSARADIUS');
+		document.title="Submitting New PIN for Realm $(cs-realm)";
+		document.getElementById('heading1').style.display='none';
+		document.getElementById('reasondiv').style.display='none';
+		document.getElementById('challengediv').style.display='none';
+		document.auth_form.style.display='none';
+		document.pin_form.style.display='none';
+		document.query_form.style.display='none';
+		document.message_form.style.display='none';
+		setTimeout("document.pin_form.submit()", 1000);
+	}
+	else if (formtype=='M')
+	{
+		document.title="Message for Realm $(cs-realm)";
+		document.getElementById('heading1').innerHTML="Message for Realm $(cs-realm)";
+		document.getElementById('reasondiv').style.display='none';
+		document.auth_form.style.display='none';
+		document.pin_form.style.display='none';
+		document.query_form.style.display='none';
+		document.message_form.style.display='block';
+	}
+}
+</script>
+</HEAD>
+<BODY onload="startup();">
+<H1 id="heading1">Enter Proxy Credentials for Realm $(cs-realm)</H1>
+<!--
+<P>Debug Info:
+<P>
+<P>exception.last_error:  $(exception.last_error)
+<P>exception.id:  $(exception.id)
+<P>exception.reason:  $(exception.reason)
+<P>cs-auth-type:  $(cs-auth-type)
+<P>x-auth-challenge-string:  $(x-auth-challenge-string)
+<P>x-cs-auth-form-action-url:  $(x-cs-auth-form-action-url)
+<P>cs-username:  $(cs-username)
+<P>x-auth-private-challenge-state:  $(x-auth-private-challenge-state)
+<P>cs-realm:  $(cs-realm)
+<P>
+<P>Debug Info End:
+-->
+<P><div id="reasondiv">Reason for challenge: $(exception.last_error)</div>
+<P><div id="challengediv">$(x-auth-challenge-string)</div>
+<FORM NAME="auth_form" METHOD="POST" ACTION=$(x-cs-auth-form-action-url)>
+$(x-cs-auth-form-empty-domain-field)
+<P>Username: <INPUT NAME="PROXY_SG_USERNAME" VALUE="$(cs-username)" MAXLENGTH="64"></P>
+<P>Password: <INPUT TYPE=PASSWORD NAME="PROXY_SG_PASSWORD" MAXLENGTH="64"></P>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_REQUEST_ID" VALUE="$(x-cs-auth-request-id)">
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_PRIVATE_CHALLENGE_STATE" VALUE="$(x-auth-private-challenge-state)">
+<P><INPUT TYPE=SUBMIT VALUE="Submit"> <INPUT TYPE=RESET></P>
+</FORM>
+<FORM NAME="pin_form" METHOD="POST" ACTION=$(x-cs-auth-form-action-url) ONSUBMIT="return validatePin()">
+$(x-cs-auth-form-empty-domain-field)
+<P> Enter New Pin: <INPUT TYPE=PASSWORD NAME="PROXY_SG_PASSWORD" MAXLENGTH="64"></P>
+<P>Retype New Pin: <INPUT TYPE=PASSWORD NAME="PROXY_SG_RETYPE_PIN" MAXLENGTH="64"></P>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_USERNAME" VALUE=$(cs-username)>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_REQUEST_ID" VALUE=$(x-cs-auth-request-id)>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_PRIVATE_CHALLENGE_STATE" VALUE=$(x-auth-private-challenge-state)>
+<P><INPUT TYPE=SUBMIT VALUE="Submit"></P>
+</FORM>
+<FORM NAME="query_form" METHOD="POST" ACTION=$(x-cs-auth-form-action-url)>
+$(x-cs-auth-form-empty-domain-field)
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_USERNAME" VALUE=$(cs-username)>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_REQUEST_ID" VALUE=$(x-cs-auth-request-id)>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_PRIVATE_CHALLENGE_STATE" VALUE=$(x-auth-private-challenge-state)>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_PASSWORD"">
+<P><INPUT TYPE=SUBMIT VALUE="Yes" ONCLICK="PROXY_SG_PASSWORD.value='Y'">
+<INPUT TYPE=SUBMIT VALUE="No" ONCLICK="PROXY_SG_PASSWORD.value='N'"></P>
+</FORM>
+<FORM NAME="message_form" METHOD="POST" ACTION=$(x-cs-auth-form-action-url)>
+$(x-cs-auth-form-empty-domain-field)
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_USERNAME" VALUE=$(cs-username)>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_REQUEST_ID" VALUE=$(x-cs-auth-request-id)>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_PRIVATE_CHALLENGE_STATE" VALUE=$(x-auth-private-challenge-state)>
+<INPUT TYPE=HIDDEN NAME="PROXY_SG_PASSWORD"">
+<P><INPUT TYPE=SUBMIT VALUE="OK"></P>
+</FORM>
+<P>$(exception.contact)
+</BODY>
+</HTML>
+--31a8fea6.a4f44--
+      )
+    )
+  )
+  (exception.validation_form
+    (properties
+      (form_type "validation_form")
+    )
+    (http
+      (code "200")
+      (format <<--31a8fea6.a4f92--
+<html>
+<head>
+  <title>Captcha Form</title>
+</head>
+<body>
+  <script type="text/javascript">
+    function Refresh()
+    {
+      location.reload();
+    }
+  </script>
+  <h1 id="heading1">Enter Solution</h1>
+  <p/>
+  <h2>Reason for challenge: The nature of the website being accessed requires a second-factor authentication</h2>
+  <p/>Please solve the following
+  <p/>
+  <table cellspacing="0" border="0" cellpadding="8">
+    <tr style="background-color:#000088; vertical-align:bottom;">
+      <td>
+	<a href="#" onclick="return Refresh();"><span style="font-size:14px;color:#ffffff">Reload</span></a><br />
+	<img src="data:image/png;base64,$(validator.challenge)"/>
+      </td>
+    </tr>
+  </table>
+  <form method="post" action=$(x-cs-validator-form-action-url)>
+<!-- $(x-cs-auth-form-action-url) -->
+    <p/>Solution: <input type="text" name="PROXY_SG_VALIDATOR_ANSWER"/>
+    <input type="hidden" name="PROXY_SG_VALIDATOR_CHALLENGE_ID" value="$(validator.challenge.id)"/>
+    <p/><input type="submit" value="Submit"/>
+  </form>
+</body>
+</html>
+--31a8fea6.a4f92--
+      )
+    )
+  )
+)
+end-833158822-inline
+!
+!- END authentication
+!- BEGIN policy
+inline policy local end-833158822-inline
+; Empty local policy object
+<Cache>
+  url.extension=doc cache(yes) ttl(600)
+  url.extension=xls cache(yes) ttl(600)
+  url.extension=ppt cache(yes) ttl(600)
+  url.extension=hwp cache(yes) ttl(600)
+  url.extension=pdf cache(yes) ttl(600)
+  url.extension=swf cache(no)
+  url.extension=css cache(no)
+  url.extension=aspx cache(no)
+  url.extension=JS cache(no)
+  url.extension=jsp cache(no)
+  url.extension=asp cache(no)
+  url.extension=php cache(no)
+  url.extension=xml cache(no)
+  always_verify(yes)
+end-833158822-inline
+inline policy vpm end-833158822-inline end-833158822-inline-xml
+;; CPL generated by Visual Policy Manager: [Fri Jun 03 17:36:55 KST 2016]
+;*************************************************************
+; WARNING:
+;     THIS FILE IS AUTOMATICALLY GENERATED - DO NOT EDIT!
+;     ANY MANUAL CHANGES TO THIS FILE WILL BE LOST WHEN VPM
+;     POLICY IS REINSTALLED.
+;*************************************************************
+
+
+
+;; Tab: [SSL Intercept Layer (1)]
+<SSL-Intercept>
+	ssl.forward_proxy(no)	; Rule 1
+	
+;; Tab: [SSL Access Layer (1)]
+<SSL>
+	server.certificate.validate(no)	; Rule 1
+	
+;; Tab: [Web Content Layer (1)]
+<Cache>
+	
+
+
+end-833158822-inline
+<?xml version="1.0" encoding="UTF-8"?>
+<!--***************************************************************-->
+<!-- WARNING:                                                      -->
+<!--     THIS FILE IS AUTOMATICALLY GENERATED - DO NOT EDIT!       -->
+<!--     MANUALLY EDITING THIS FILE MAY PREVENT VPM FROM BEING     -->
+<!--     ABLE TO LOAD POLICY.                                      -->
+<!--***************************************************************-->
+<vpmapp>
+<vpmxml-info
+version="631">
+</vpmxml-info>
+<conditionObjects>
+<vpm-cat>
+</vpm-cat>
+<svr-cert-valdn
+name="ServerCertValidation1"
+vldtn="false">
+</svr-cert-valdn>
+<ssl-fwd-prxy
+m="no"
+name="Disable SSL Interception"
+on-exc="false">
+</ssl-fwd-prxy>
+</conditionObjects>
+<layers>
+<layer
+layertype="com.bluecoat.sgos.vpm.SSLInterceptPolicyTable">
+<name>
+SSL Intercept Layer (1)</name>
+<numRows>
+1</numRows>
+<rowItem
+enabled="true"
+num="0">
+<colItem
+col="0"
+id="no"
+value="1">
+</colItem>
+<colItem
+col="1"
+id="so"
+name="Any"
+type="String">
+</colItem>
+<colItem
+col="2"
+id="de"
+name="Any"
+type="String">
+</colItem>
+<colItemV2
+id="se"
+name="Any"
+type="String">
+</colItemV2>
+<colItem
+col="3"
+id="ac"
+name="Disable SSL Interception"
+negate="false"
+type="Condition">
+</colItem>
+<colItem
+col="4"
+id="tr"
+name="None"
+type="String">
+</colItem>
+<colItem
+col="5"
+id="co"
+name=""
+type="String">
+</colItem>
+</rowItem>
+</layer>
+<layer
+layertype="com.bluecoat.sgos.vpm.SSLAccessPolicyTable">
+<name>
+SSL Access Layer (1)</name>
+<numRows>
+1</numRows>
+<rowItem
+enabled="true"
+num="0">
+<colItem
+col="0"
+id="no"
+value="1">
+</colItem>
+<colItem
+col="1"
+id="so"
+name="Any"
+type="String">
+</colItem>
+<colItem
+col="2"
+id="de"
+name="Any"
+type="String">
+</colItem>
+<colItem
+col="3"
+id="se"
+name="Any"
+type="String">
+</colItem>
+<colItem
+col="4"
+id="ac"
+name="ServerCertValidation1"
+negate="false"
+type="Condition">
+</colItem>
+<colItem
+col="5"
+id="tr"
+name="None"
+type="String">
+</colItem>
+<colItem
+col="6"
+id="co"
+name=""
+type="String">
+</colItem>
+</rowItem>
+</layer>
+<layer
+layertype="com.bluecoat.sgos.vpm.WebContentPolicyTable">
+<name>
+Web Content Layer (1)</name>
+<numRows>
+0</numRows>
+</layer>
+</layers>
+</vpmapp>
+
+end-833158822-inline-xml
+!- END policy
